@@ -1,105 +1,85 @@
 #include "mainwindow.h"
 #include <qdebug.h>
-QImage cvMat2QImage(const cv::Mat& mat)
-{
-    // 8-bits unsigned, NO. OF CHANNELS = 1
-    if(mat.type() == CV_8UC1)
-    {
-        QImage image(mat.cols, mat.rows, QImage::Format_Indexed8);
-        // Set the color table (used to translate colour indexes to qRgb values)
-        image.setColorCount(256);
-        for(int i = 0; i < 256; i++)
-        {
-            image.setColor(i, qRgb(i, i, i));
-        }
-        // Copy input Mat
-        uchar *pSrc = mat.data;
-        for(int row = 0; row < mat.rows; row ++)
-        {
-            uchar *pDest = image.scanLine(row);
-            memcpy(pDest, pSrc, mat.cols);
-            pSrc += mat.step;
-        }
-        return image;
-    }
-    // 8-bits unsigned, NO. OF CHANNELS = 3
-    else if(mat.type() == CV_8UC3)
-    {
-        // Copy input Mat
-        const uchar *pSrc = (const uchar*)mat.data;
-        // Create QImage with same dimensions as input Mat
-        QImage image(pSrc, mat.cols, mat.rows, mat.step, QImage::Format_RGB888);
-        return image.rgbSwapped();
-    }
-    else if(mat.type() == CV_8UC4)
-    {
-        qDebug() << "CV_8UC4";
-        // Copy input Mat
-        const uchar *pSrc = (const uchar*)mat.data;
-        // Create QImage with same dimensions as input Mat
-        QImage image(pSrc, mat.cols, mat.rows, mat.step, QImage::Format_ARGB32);
-        return image.copy();
-    }
-    else
-    {
-        qDebug() << "ERROR: Mat could not be converted to QImage.";
-        return QImage();
-    }
-}
-cv::Mat QImage2cvMat(QImage image)
-{
-    cv::Mat mat;
-    qDebug() << image.format();
-    switch(image.format())
-    {
-    case QImage::Format_ARGB32:
-    case QImage::Format_RGB32:
-    case QImage::Format_ARGB32_Premultiplied:
-        mat = cv::Mat(image.height(), image.width(), CV_8UC4, (void*)image.constBits(), image.bytesPerLine());
-        break;
-    case QImage::Format_RGB888:
-        mat = cv::Mat(image.height(), image.width(), CV_8UC3, (void*)image.constBits(), image.bytesPerLine());
-        cv::cvtColor(mat, mat, CV_BGR2RGB);
-        break;
-    case QImage::Format_Indexed8:
-        mat = cv::Mat(image.height(), image.width(), CV_8UC1, (void*)image.constBits(), image.bytesPerLine());
-        break;
-    }
-    return mat;
-}
+
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
-    centralImageLabel(this),
-    cameraTimer(this),
-    capture(0)
+    m_centralWidget(this)
+
 {
-    centralImageLabel.setAlignment(Qt::AlignCenter|Qt::AlignHCenter);
+    // add menubar
+    /*
+    openImageAct = new QAction("Open Image", this);
+    openCameraAct = new QAction("Open Camera", this);
+    saveImageAct = new QAction("Save Image", this);
+    closeCameraAct = new QAction("Close Camera", this);
 
-    centralImageLabel.setText("This is a opencv laboratory");
+    connect(openImageAct, &QAction::triggered, this, &MainWindow::OpenImage);
+    connect(openCameraAct, &QAction::triggered, this, &MainWindow::OpenCamera);
+    connect(saveImageAct, &QAction::triggered, this, &MainWindow::SaveImage);
+    connect(closeCameraAct, &QAction::triggered, this, &MainWindow::CloseCamera);
 
-    this->setCentralWidget(&centralImageLabel);
+
+
+
+    fileMenu = menuBar()->addMenu(tr("&File"));
+    fileMenu->addAction(openImageAct);
+    fileMenu->addAction(openCameraAct);
+    fileMenu->addAction(saveImageAct);
+    fileMenu->addAction(closeCameraAct);
+
+*/
+
+    //add toolbars
+    SetupToolBars();
+
+
+    this->setCentralWidget(&m_centralWidget);
 
  //   cv::namedWindow("img");
-    connect(&cameraTimer, SIGNAL(timeout()), this, SLOT(CaptureImage()));
-    cameraTimer.start(33);
+
+
+}
+
+void MainWindow::SetupToolBars()
+{
+    GeneralToolbar* genToolbar = new GeneralToolbar("GeneralToolbar", this);
+    toolBarList.append(genToolbar);
+    addToolBar(genToolbar);
 
 }
 
 MainWindow::~MainWindow()
 {
-    capture.release();
-//    cv::destroyAllWindows();
+
 }
 
 void MainWindow::CaptureImage()
 {
-    if(!capture.isOpened())
-    {
-        cameraTimer.stop();
-        centralImageLabel.setText("camera opened failed!");
-    }
-    cv::Mat frame;
-    capture >> frame;
-//    cv::imshow("img", frame);
-    QImage img = cvMat2QImage(frame);
-    centralImageLabel.setPixmap(QPixmap::fromImage(img));
+
 }
+
+void MainWindow::OpenImage()
+{
+
+}
+
+void MainWindow::OpenCamera()
+{
+
+
+}
+
+void MainWindow::SaveImage()
+{
+
+
+}
+
+void MainWindow::CloseCamera()
+{
+
+
+}
+
+
+
+

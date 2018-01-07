@@ -2,27 +2,37 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QLabel>
-#include <QTimer>
-#include <opencv2/core/core.hpp>
-#include <opencv2/opencv.hpp>
-#include <opencv2/highgui.hpp>
-#include <opencv2/imgproc.hpp>
+#include "centralwidget.h"
+
+#include <QMenuBar>
+#include <QList>
+
+
+#include "generaltoolbar.h"
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+    void SetupToolBars();
 
+public:
+    CentralWidget m_centralWidget;
 
 private:
-    QLabel centralImageLabel;
-    QTimer cameraTimer;
+    //ui element
+    //Menu-File
+    QMenu* fileMenu;
 
-    cv::VideoCapture capture;
+    QList<QToolBar*> toolBarList;
 
 
+    QAction* openImageAct;
+    QAction* openCameraAct;
+    QAction* saveImageAct;
+    QAction* closeCameraAct;
 
 
 
@@ -30,6 +40,10 @@ private:
 signals:
 
 public slots:
+    void OpenImage();
+    void OpenCamera();
+    void SaveImage();
+    void CloseCamera();
     void CaptureImage();
 };
 
